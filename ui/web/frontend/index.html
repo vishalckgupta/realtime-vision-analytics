@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vision System</title>
+</head>
+
+<body>
+    <h1>Vision System</h1>
+    <video
+        id="video"
+        width="640"
+        height="480"
+        controls
+        autoplay>
+    </video>
+    <script>
+        const video = document.getElementById("video")
+        video.src = "tcp://localhost:9001"
+    </script>
+</body>
+</html>
+

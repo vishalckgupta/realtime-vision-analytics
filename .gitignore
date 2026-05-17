@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual env
+venv/
+.env/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Shared memory dumps
+/dev/shm/
+
+# Model weights
+*.pt
+*.onnx
+*.engine
+
+# Build files
+build/
+dist/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Qt
+*.pro.user
+
+# Temporary
+tmp/
+temp/
