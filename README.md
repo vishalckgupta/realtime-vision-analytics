@@ -80,13 +80,13 @@ The framework is designed with an industrial-style modular architecture, emphasi
                           |
                           v
                 +-------------------+
-                | GStreamer Capture |
-                +---------+---------+
-                          |
-                          v
-                +-------------------+
-                | Shared Memory Bus |
-                +---------+---------+
+                | GStreamer Capture |-----------------
+                +---------+---------+                |
+                          |                          |
+                          v                          v
+                +-------------------+       +---------------------+
+                | Shared Memory Bus |       |Stream out as MPEGTS |
+                +---------+---------+       +---------------------+
                           |
                           v
                 +-------------------+
@@ -108,9 +108,11 @@ The framework is designed with an industrial-style modular architecture, emphasi
           |                               |
           v                               v
 +-------------------+        +-------------------+
-| Qt Desktop Viewer |        | Web/API Streamer |
+| Qt Desktop Viewer |        | Web/API Streamer  | 
 +-------------------+        +-------------------+
+```
 
+Note: Web/API Streamer is still work in progress, I still have not got a glitch free output yet
 
 # Technologies Used
 
@@ -127,6 +129,7 @@ The framework is designed with an industrial-style modular architecture, emphasi
 
 # Project structure
 
+```
 vision_system/
 │
 ├── apps/
@@ -152,6 +155,7 @@ vision_system/
 │       └── backend/
 │
 └── README.md
+```
 
 # Installation
 

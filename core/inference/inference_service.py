@@ -16,7 +16,7 @@ class InferenceService(BaseService):
         super().__init__("InferenceService")
         self.frame_bus = fbus
         self.result_bus = rbus
-        self.model = YOLO("models/yolov8n.pt")  # YOLO load
+        self.model = YOLO("core/models/yolov8n.pt")  # YOLO load
         self.enable_tracking = ENABLE_TRACKING
         self.enable_counting = ENABLE_COUNTING
         if self.enable_tracking:
@@ -74,7 +74,7 @@ class InferenceService(BaseService):
             conf = float(box.conf[0])
             cls = int(box.cls[0])
             label = self.model.names[cls]
-            if label != "cell phone" and self.enable_tracking:  # This limits the detection to only single artifact
+            if label != TRACK_OBJ and self.enable_tracking:  # This limits the detection to only single artifact
                 continue
             detections.append(
                 Detection(label, conf, (int(x1), int(y1), int(x2), int(y2)))

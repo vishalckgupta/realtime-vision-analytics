@@ -16,7 +16,7 @@ from ui.qt.qt_app import QtApp
 bus = SharedMemoryBus("video_frames", (FRAME_Y, FRAME_X, 3), create=True)
 f_bus = FrameBus(bus)
 app = VisionApplication()
-gst = GstService(f_bus, FRAME_X, FRAME_Y)
+gst = GstService(f_bus, FRAME_X, FRAME_Y, INPUT_INTERNAL, STREAM_NONE)
 app.add_service(gst)
 app.add_resource(f_bus)
 r_bus = ResultBus(bus)
