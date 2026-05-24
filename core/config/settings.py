@@ -11,7 +11,7 @@ RTSP_URL = "rtsp://drawingroom:drawingroom@192.168.1.51:554/stream1"
 
 #STREAMING_MODE = "MPEGTS"
 STREAM_NONE = "None"
-STREAM_MPEDTS = "MPEGTS"
+STREAM_MPEGTS = "MPEGTS"
 
 # Camera Resolution
 FRAME_X = 640

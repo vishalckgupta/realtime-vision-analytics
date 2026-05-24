@@ -24,9 +24,9 @@ class StreamService(BaseService):
 
     def build_pipeline(self):
         pipeline_str = f"""
-        appsrc name=mysrc is-live=true block=true format=time ! queue !
-        videoconvert ! x264enc tune=zerolatency speed-preset=ultrafast bitrate=1000 key-int-max=15 ! h264parse !
-        mpegtsmux ! tcpserversink host=0.0.0.0 port=9001 sync=false
+        appsrc name=mysrc is-live=true block=true format=time caps=video/x-raw,format=BGR,width={self.width},height={self.height},framerate=15/1 ! queue !
+        videoconvert ! video/x-raw,format=I420 ! avenc_mpeg1video bitrate=1500 !
+        mpegtsmux ! tcpserversink host=0.0.0.0 port=9002 sync=false
         """
         self.pipeline = Gst.parse_launch(pipeline_str)
         self.appsrc = self.pipeline.get_by_name("mysrc")

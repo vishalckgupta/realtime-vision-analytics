@@ -74,42 +74,88 @@ The framework is designed with an industrial-style modular architecture, emphasi
 # High-Level Architecture
 
 ```text
-                +-------------------+
-                |   Camera Source   |
-                +---------+---------+
-                          |
-                          v
-                +-------------------+
-                | GStreamer Capture |-----------------
-                +---------+---------+                |
-                          |                          |
-                          v                          v
-                +-------------------+       +---------------------+
-                | Shared Memory Bus |       |Stream out as MPEGTS |
-                +---------+---------+       +---------------------+
-                          |
-                          v
-                +-------------------+
-                | Inference Worker  |
-                |   YOLO Detector   |
-                +---------+---------+
-                          |
-                          v
-                +-------------------+
-                | Tracking + Count  |
-                +---------+---------+
-                          |
-                          v
-                +-------------------+
-                |    Result Bus     |
-                +----+--------+-----+
-                     |        |
-          +----------+        +-----------+
-          |                               |
-          v                               v
-+-------------------+        +-------------------+
-| Qt Desktop Viewer |        | Web/API Streamer  | 
-+-------------------+        +-------------------+
+
++-----------------------------------------------------------------------------------+
+|                           Realtime Vision Analytics                               |
++-----------------------------------------------------------------------------------+
+
+                ┌──────────────────────────────┐
+                │        Video Source          │
+                │------------------------------│
+                │ • USB Webcam (MJPEG)         │
+                │ • RTSP IP Camera (H264)      │
+                └──────────────┬───────────────┘
+                               │
+                               ▼
+
+                ┌──────────────────────────────┐
+                │     GStreamer Ingestion      │
+                │------------------------------│
+                │ Decode / Convert / Scale     │
+                │ Low-Latency Queue Handling   │
+                └──────────────┬───────────────┘
+                               │
+                               ▼
+
+                ┌──────────────────────────────┐
+                │          Tee Split           │
+                └───────┬───────────┬──────────┘
+                        │           │
+                        │           │
+                        │           │
+
+        RAW STREAM BRANCH           AI INFERENCE BRANCH
+        ------------------          -------------------
+
+    ┌──────────────────────┐     ┌──────────────────────┐
+    │ MPEG1 Video Encoder  │     │ OpenCV Appsink       │
+    │ MPEGTS Muxer         │     │ Frame Extraction     │
+    │ tcpserversink        │     │                      │
+    └──────────┬───────────┘     └──────────┬───────────┘
+               │                            │
+               │                            ▼
+               │                 ┌──────────────────────┐
+               │                 │ YOLO / AI Inference  │
+               │                 │ Object Tracking      │
+               │                 │ Counting Logic       │
+               │                 └──────────┬───────────┘
+               │                            │
+               │                            ▼
+               │                 ┌──────────────────────┐
+               │                 │ Annotated Frame      │
+               │                 │ Generation           │
+               │                 └──────────┬───────────┘
+               │                            │
+               │                            ▼
+               │                 ┌──────────────────────┐
+               │                 │ appsrc               │
+               │                 │ MPEG1 Encoder        │
+               │                 │ MPEGTS Muxer         │
+               │                 │ tcpserversink        │
+               │                 └──────────┬───────────┘
+               │                            │
+               └──────────────┬─────────────┘
+                              │
+                              ▼
+
+                ┌──────────────────────────────┐
+                │      Node.js Stream Router   │
+                │------------------------------│
+                │ TCP Client Connections       │
+                │ WebSocket Broadcasting       │
+                │ /raw and /ai streams         │
+                └──────────────┬───────────────┘
+                               │
+                               ▼
+
+                ┌──────────────────────────────┐
+                │        Web Frontend          │
+                │------------------------------│
+                │ JSMpeg Browser Players       │
+                │ Side-by-Side Streams         │
+                │ Live AI Counters             │
+                └──────────────────────────────┘
+
 ```
 
 Note: Web/API Streamer is still work in progress, I still have not got a glitch free output yet
@@ -252,13 +298,17 @@ tcpclientsrc host=<SERVER_IP> port=9001 \
 * Heatmaps
 * Event logging
 
-## Architecture
+## Architecture Highlights
 
-* Unified telemetry system
-* Advanced profiling
-* Dynamic configuration
-* Plugin-based processing pipeline
-
+- Modular GStreamer-based ingestion pipeline
+- Supports both USB cameras and RTSP IP cameras
+- Low-latency tee-based dual-stream architecture
+- Parallel AI inference and raw-stream monitoring
+- OpenCV + YOLO object detection/tracking
+- Browser-based live monitoring using WebSockets + JSMpeg
+- Multi-process scalable design
+- Shared-memory frame transport for AI pipeline
+- Designed for Linux and Raspberry Pi deployment
 
 # Engineering Goals
 

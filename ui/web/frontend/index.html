@@ -1,22 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Vision System</title>
-</head>
+    <meta charset="UTF-8">
+    <title>Realtime Vision Analytics</title>
 
+    <script src="js/jsmpeg.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            background: #111;
+            color: white;
+            font-family: Arial;
+        }
+        h1 {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .panel {
+            border: 2px solid #444;
+            padding: 10px;
+            background: #222;
+        }
+        canvas {
+            width: 640px;
+            height: 480px;
+            background: black;
+        }
+
+        .label {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+    </style>
+</head>
 <body>
-    <h1>Vision System</h1>
-    <video
-        id="video"
-        width="640"
-        height="480"
-        controls
-        autoplay>
-    </video>
-    <script>
-        const video = document.getElementById("video")
-        video.src = "tcp://localhost:9001"
-    </script>
+
+<h1>Realtime Vision Analytics</h1>
+
+<div class="container">
+
+    <div class="panel">
+        <div class="label">Raw Camera Stream</div>
+        <canvas id="video1"></canvas>
+    </div>
+
+    <div class="panel">
+        <div class="label">AI Inference Output</div>
+        <canvas id="video2"></canvas>
+    </div>
+
+</div>
+
+<script>
+
+    const player1 = new JSMpeg.Player(
+        'ws://localhost:8082/raw',
+        {
+            canvas: document.getElementById('video1'),
+            autoplay: true,
+            audio: false,
+            loop: true,
+            disableGl: false,
+            preserveDrawingBuffer: true
+        }
+    );
+
+    const player2 = new JSMpeg.Player(
+        'ws://localhost:8082/ai',
+        {
+            canvas: document.getElementById('video2'),
+            autoplay: true,
+            audio: false,
+            loop: true,
+            disableGl: false,
+            preserveDrawingBuffer: true
+        }
+    );
+
+</script>
+
 </body>
 </html>
 
