@@ -2,12 +2,17 @@
 
 import numpy as np
 from gi.repository import Gst
+from core.telemetry.metrics import metrics
+import time
+from core.contracts.frame_packet import FramePacket
 
 class FrameCallback:
     def __init__(self, bus):
         self.bus = bus
+        self.frame_id = 0
 
     def on_new_sample(self, sink):
+        metrics.capture_fps.tick()
         sample = sink.emit("pull-sample")
         buffer = sample.get_buffer()
         caps = sample.get_caps()
@@ -24,8 +29,14 @@ class FrameCallback:
         frame = frame.reshape((height, width, 3))
 
         # For DEBUG
-        #print(frame.shape)
-        self.bus.publish(frame)
+        #print("FrameCallback => Packet Pushed")
+        packet = FramePacket(
+            frame_id=self.frame_id,
+            capture_ts=time.monotonic(),
+            frame=frame
+        )
+        self.frame_id += 1
+        self.bus.publish(packet)
 
         buffer.unmap(map_info)
         return Gst.FlowReturn.OK

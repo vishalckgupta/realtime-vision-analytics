@@ -8,6 +8,7 @@ import numpy as np
 gi.require_version("Gst", "1.0")
 from gi.repository import Gst
 from core.app.service import BaseService
+from core.telemetry.metrics import metrics
 
 class StreamService(BaseService):
     def __init__(self, frame_bus, result_bus, width, height):
@@ -61,12 +62,18 @@ class StreamService(BaseService):
         duration = Gst.util_uint64_scale_int(1, Gst.SECOND, 15)
         self.timestamp = 0
         while self.running:
-            #print("Stream_service => Trying to pull frame from bus")
-            frame = self.frame_bus.latest()
+            print("Stream_service => Trying to pull frame from bus")
+            packet = self.frame_bus.latest()
+            if packet is None:
+                print("Stream_service => No packet recieved")
+                time.sleep(0.5)
+                continue
+            frame = packet.frame.copy()
             if frame is None:
+                print("Stream_service => No frame in packet")
                 time.sleep(0.01)
                 continue
-            #print(frame.shape, frame.dtype)
+            print(frame.shape, frame.dtype)
             self.draw_results(frame)
             frame = np.ascontiguousarray(frame)
             data = frame.tobytes()
@@ -81,7 +88,8 @@ class StreamService(BaseService):
 
             if retval != Gst.FlowReturn.OK:
                 print("GST push-buffer failed")
-            #print(retval)
+            metrics.stream_fps.tick()
+            print(retval)
 
     def draw_results(self, frame):
         result = self.result_bus.latest()

@@ -4,20 +4,27 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout
 from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QImage, QPixmap
+from core.telemetry.metrics import metrics
+from ui.qt.telemetry_panel import TelemetryPanel
+from PyQt5.QtWidgets import (QHBoxLayout, QVBoxLayout)
+from PyQt5.QtWidgets import QMainWindow
+from core.contracts.frame_packet import FramePacket
 
-class QtApp(QWidget):
+class QtApp(QMainWindow):
     def __init__(self, fbus, rbus):
         super().__init__()
         self.fbus = fbus
         self.rbus = rbus
         #self.cleanup_callback = cleanup_callback
-
-        #self.setWindowTitle("Vision System")
+        central = QWidget()
+        self.setCentralWidget(central)
+        main_layout = QHBoxLayout()
+        central.setLayout(main_layout)
+        self.setWindowTitle("Vision System")
         self.label = QLabel()
-        
-        layout = QVBoxLayout()
-        layout.addWidget(self.label)
-        self.setLayout(layout)
+        main_layout.addWidget(self.label, 3)
+        self.telemetry = TelemetryPanel()
+        main_layout.addWidget(self.telemetry, 1)
 
         # Timer for updating frames (~30 FPS)
         self.timer = QTimer()
@@ -25,7 +32,10 @@ class QtApp(QWidget):
         self.timer.start(30)
 
     def update_frame(self):
-        frame = self.fbus.latest()
+        packet = self.fbus.latest()
+        if packet is None:
+            return
+        frame = packet.frame.copy()
         result = self.rbus.latest()
 
         if frame is None:
@@ -81,6 +91,7 @@ class QtApp(QWidget):
 
         qt_image = QImage(frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
         self.label.setPixmap(QPixmap.fromImage(qt_image))
+        metrics.stream_fps.tick()
 
 #    def keyPressEvent(self, event):
 #        if event.key() == Qt.Key_Q:

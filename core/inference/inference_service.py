@@ -9,7 +9,7 @@ from core.contracts.schemas import Detection, Result, TrackedObject
 from ultralytics import YOLO
 from core.config.settings import *
 import numpy as np
-
+from core.telemetry.metrics import metrics
 
 class InferenceService(BaseService):
     def __init__(self, fbus, rbus, w=FRAME_Y, h=FRAME_X):
@@ -52,9 +52,15 @@ class InferenceService(BaseService):
     def run_thread(self):
         #while not self.stop_event.is_set():
         while self.inf_running:
-            frame = self.frame_bus.latest()
+            metrics.inference_fps.tick()
+            packet = self.frame_bus.latest()
+            if packet is None:
+                continue
+            frame = packet.frame
+            capture_ts = packet.capture_ts
             if frame is None:
                 continue
+            packet.inference_start_ts = time.monotonic()
             detections, det_array = self.detect(frame)  # det_array contains box cordinates and confidence
             tracks = self.track(det_array)              # Get Tracked objects(in boxes) with ids
             tracked_objects = self.build_tracked_objects(detections, tracks)    # Get tracked objects
@@ -62,11 +68,16 @@ class InferenceService(BaseService):
 
             result = self.build_result(detections, tracked_objects) # Combine all data, tracked objects, count etc
             self.publish(result)                        # Push data to shared memory
-
+            now = time.monotonic()
+            packet.inference_end_ts = time.monotonic()
+            metrics.end_to_end_latency_ms = ( (packet.inference_end_ts - packet.capture_ts) * 1000 )
             self.frame_id += 1
 
     def detect(self, frame):
+        start = time.monotonic()
         results = self.model(frame)[0]          # Apply YOLO model
+        end = time.monotonic()
+        metrics.inference_latency_ms = (end - start) * 1000
         detections = []
         det_array = []
         for box in results.boxes:               # Each box represents a detected artifact

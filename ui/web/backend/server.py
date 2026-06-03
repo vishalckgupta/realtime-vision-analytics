@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from core.telemetry.metrics import metrics
 
 app = FastAPI()
 
@@ -11,6 +12,10 @@ def index():
         "r"
     ) as f:
         return HTMLResponse(f.read())
+
+@app.get("/api/telemetry")
+def get_telemetry():
+    return metrics.snapshot()
 
 app.mount(
     "/",

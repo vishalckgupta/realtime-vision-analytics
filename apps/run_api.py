@@ -15,7 +15,7 @@ import signal
 bus = SharedMemoryBus("video_frames", (FRAME_Y, FRAME_X, 3), create=True)
 f_bus = FrameBus(bus)
 vision = VisionApplication()
-gst = GstService(f_bus, FRAME_X, FRAME_Y, INPUT_EXTERNAL, STREAM_MPEGTS)
+gst = GstService(f_bus, FRAME_X, FRAME_Y, INPUT_INTERNAL, STREAM_MPEGTS)
 vision.add_service(gst)
 vision.add_resource(f_bus)
 r_bus = ResultBus(bus)

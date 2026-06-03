@@ -60,6 +60,21 @@
 
 </div>
 
+<div id="telemetry-panel">
+
+    <h3>Telemetry</h3>
+
+    <div>Capture FPS: <span id="capture-fps">0</span></div>
+    <div>Inference FPS: <span id="inference-fps">0</span></div>
+    <div>Stream FPS: <span id="stream-fps">0</span></div>
+
+    <div>Inference Latency: <span id="infer-lat">0</span> ms</div>
+    <div>End-to-End Latency: <span id="e2e-lat">0</span> ms</div>
+
+    <div>Dropped Frames: <span id="drops">0</span></div>
+
+</div>
+
 <script>
 
     const player1 = new JSMpeg.Player(
@@ -86,6 +101,39 @@
         }
     );
 
+async function updateTelemetry() {
+
+try {
+
+        const response = await fetch("/api/telemetry");
+
+        const data = await response.json();
+
+        document.getElementById("capture-fps").innerText =
+            data.capture_fps;
+
+        document.getElementById("inference-fps").innerText =
+            data.inference_fps;
+
+        document.getElementById("stream-fps").innerText =
+            data.stream_fps;
+
+        document.getElementById("infer-lat").innerText =
+            data.inference_latency_ms;
+
+        document.getElementById("e2e-lat").innerText =
+            data.end_to_end_latency_ms;
+
+        document.getElementById("drops").innerText =
+            data.dropped_frames;
+
+    } catch (err) {
+
+        console.error(err);
+    }
+}
+
+    setInterval(updateTelemetry, 500);
 </script>
 
 </body>
