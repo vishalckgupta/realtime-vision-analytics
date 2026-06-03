@@ -29,7 +29,7 @@ class FrameCallback:
         frame = frame.reshape((height, width, 3))
 
         # For DEBUG
-        #print("FrameCallback => Packet Pushed")
+        print("FrameCallback => Packet Pushed")
         packet = FramePacket(
             frame_id=self.frame_id,
             capture_ts=time.monotonic(),

@@ -12,10 +12,15 @@ from ui.web.backend.stream_service import StreamService
 import uvicorn
 import signal
 
+# In a seperate terminal, run following command
+# node ui/web/backend/stream_router.js
+# And in browser, lookup this URL: http://localhost:8000/
+# To view the AI stream with telemetry
+
 bus = SharedMemoryBus("video_frames", (FRAME_Y, FRAME_X, 3), create=True)
 f_bus = FrameBus(bus)
 vision = VisionApplication()
-gst = GstService(f_bus, FRAME_X, FRAME_Y, INPUT_INTERNAL, STREAM_MPEGTS)
+gst = GstService(f_bus, FRAME_X, FRAME_Y, INPUT_INTERNAL, STREAM_NONE)
 vision.add_service(gst)
 vision.add_resource(f_bus)
 r_bus = ResultBus(bus)

@@ -9,6 +9,7 @@ gi.require_version("Gst", "1.0")
 from gi.repository import Gst
 from core.app.service import BaseService
 from core.telemetry.metrics import metrics
+from core.contracts.frame_packet import FramePacket
 
 class StreamService(BaseService):
     def __init__(self, frame_bus, result_bus, width, height):
