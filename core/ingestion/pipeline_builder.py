@@ -9,7 +9,10 @@ from core.config.settings import *
 def get_source_pipeline(input_mode):
     src_pipe = ""
     if input_mode == INPUT_INTERNAL:
-        src_pipe = f"v4l2src device={CAMERA_DEVICE} ! image/jpeg,width={FRAME_X},height={FRAME_Y} ! jpegdec ! videoconvert !"
+        if DETECTOR_TYPE == "onnx":
+            src_pipe = f"libcamerasrc ! video/x-raw,width={FRAME_X},height={FRAME_Y},framerate={FPS}/1  ! videoflip method=rotate-180 ! videoconvert !"
+        else:
+            src_pipe = f"v4l2src device={CAMERA_DEVICE} ! image/jpeg,width={FRAME_X},height={FRAME_Y} ! jpegdec ! videoconvert !"
     elif input_mode == INPUT_EXTERNAL:
         src_pipe = f"rtspsrc location={RTSP_URL} latency=100 drop-on-latency=true protocols=tcp ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! videoscale ! video/x-raw,width={FRAME_X},height={FRAME_Y} !"
     return src_pipe

@@ -6,19 +6,23 @@ import time
 import threading
 #from core.messaging.shm_bus import SharedMemoryBus
 from core.contracts.schemas import Detection, Result, TrackedObject
-from ultralytics import YOLO
+#from ultralytics import YOLO
 from core.config.settings import *
 import numpy as np
 from core.telemetry.metrics import metrics
+#from core.inference.onnx_detector import ONNXDetector
+from core.inference.detector_factory import DetectorFactory
 
 class InferenceService(BaseService):
     def __init__(self, fbus, rbus, w=FRAME_Y, h=FRAME_X):
         super().__init__("InferenceService")
         self.frame_bus = fbus
         self.result_bus = rbus
-        self.model = YOLO("core/models/yolov8n.pt")  # YOLO load
+        #self.detector = ONNXDetector("core/models/yolov8n_320.onnx")
+        #self.model = YOLO("core/models/yolov8n.pt")  # YOLO load
         self.enable_tracking = ENABLE_TRACKING
         self.enable_counting = ENABLE_COUNTING
+        self.detector = DetectorFactory.create(enable_tracking=self.enable_tracking)
         if self.enable_tracking:
             from core.inference.sort import Sort   # Sort Class object
             self.tracker = Sort(max_age=10, min_hits=1, iou_threshold=0.3)
@@ -53,13 +57,17 @@ class InferenceService(BaseService):
         #while not self.stop_event.is_set():
         while self.inf_running:
             metrics.inference_fps.tick()
+            #print("InferenceLoop=> reading packet")
             packet = self.frame_bus.latest()
             if packet is None:
+                print("InferenceLoop=> No packet")
                 continue
             frame = packet.frame
             capture_ts = packet.capture_ts
             if frame is None:
+                print("InferenceLoop=> No frame in packet")
                 continue
+            #print("InferenceLoop=> Frame found")
             packet.inference_start_ts = time.monotonic()
             detections, det_array = self.detect(frame)  # det_array contains box cordinates and confidence
             tracks = self.track(det_array)              # Get Tracked objects(in boxes) with ids
@@ -75,9 +83,16 @@ class InferenceService(BaseService):
 
     def detect(self, frame):
         start = time.monotonic()
-        results = self.model(frame)[0]          # Apply YOLO model
+        detections, det_array = self.detector.detect(frame)
         end = time.monotonic()
         metrics.inference_latency_ms = (end - start) * 1000
+        #print( f"Detected {len(detections)} objects" )
+        return detections, det_array
+        '''
+        print(type(results))
+        print(len(results))
+        print(results[0].shape)
+        return None, None
         detections = []
         det_array = []
         for box in results.boxes:               # Each box represents a detected artifact
@@ -95,8 +110,7 @@ class InferenceService(BaseService):
             det_array = np.empty((0, 5))
         else:
             det_array = np.array(det_array)
-
-        return detections, det_array
+        '''
 
     def track(self, det_array):
         if not self.enable_tracking:

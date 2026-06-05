@@ -5,6 +5,7 @@ from gi.repository import Gst
 from core.telemetry.metrics import metrics
 import time
 from core.contracts.frame_packet import FramePacket
+from core.config.settings import *
 
 class FrameCallback:
     def __init__(self, bus):
@@ -15,11 +16,11 @@ class FrameCallback:
         metrics.capture_fps.tick()
         sample = sink.emit("pull-sample")
         buffer = sample.get_buffer()
-        caps = sample.get_caps()
+        #caps = sample.get_caps()
 
-        structure = caps.get_structure(0)
-        width = structure.get_value("width")
-        height = structure.get_value("height")
+        #structure = caps.get_structure(0)
+        width = FRAME_X
+        height = FRAME_Y
 
         success, map_info = buffer.map(Gst.MapFlags.READ)
         if not success:
@@ -29,7 +30,7 @@ class FrameCallback:
         frame = frame.reshape((height, width, 3))
 
         # For DEBUG
-        print("FrameCallback => Packet Pushed")
+        #print("FrameCallback => Packet Pushed")
         packet = FramePacket(
             frame_id=self.frame_id,
             capture_ts=time.monotonic(),

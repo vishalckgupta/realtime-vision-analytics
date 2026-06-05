@@ -1,5 +1,7 @@
 # Overall project configuration
 
+# DETECTOR_TYPE can be "onnx" OR "ultralytics" for Raspberry Pi or Ubuntu VM respectively
+DETECTOR_TYPE = "onnx"
 # Input Stream controls ; mode = Internal / External
 
 #INPUT_MODE = "Internal"
@@ -23,5 +25,5 @@ ENABLE_COUNTING = True
 # Boundary line
 LINE_Y = FRAME_Y / 2
 # Tracked object
-#TRACK_OBJ = "cell phone"
-TRACK_OBJ = "person"
+TRACK_OBJ = "cell phone"
+#TRACK_OBJ = "person"
