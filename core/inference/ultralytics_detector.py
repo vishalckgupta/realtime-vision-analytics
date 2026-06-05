@@ -4,7 +4,7 @@ import numpy as np
 
 from ultralytics import YOLO
 
-from core.config.settings import TRACK_OBJ
+from core.config.settings import *
 from core.contracts.schemas import Detection
 
 from core.inference.detector_interface import DetectorInterface

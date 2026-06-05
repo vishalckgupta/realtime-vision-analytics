@@ -1,7 +1,8 @@
 # Overall project configuration
 
 # DETECTOR_TYPE can be "onnx" OR "ultralytics" for Raspberry Pi or Ubuntu VM respectively
-DETECTOR_TYPE = "onnx"
+#DETECTOR_TYPE = "onnx"
+DETECTOR_TYPE = "ultralytics"
 # Input Stream controls ; mode = Internal / External
 
 #INPUT_MODE = "Internal"
