@@ -79,82 +79,53 @@ The framework is designed with an industrial-style modular architecture, emphasi
 |                           Realtime Vision Analytics                               |
 +-----------------------------------------------------------------------------------+
 
-                ┌──────────────────────────────┐
-                │        Video Source          │
-                │------------------------------│
-                │ • USB Webcam (MJPEG)         │
-                │ • RTSP IP Camera (H264)      │
-                └──────────────┬───────────────┘
-                               │
-                               ▼
++-------------------+
+| Camera / RTSP     |
++-------------------+
+          |
+          v
++-------------------+
+| GStreamer Input   |
++-------------------+
+          |
+          v
++-------------------+
+| Frame Callback    |
++-------------------+
+          |
+          v
++-------------------+
+| Shared Memory Bus |
++-------------------+
+          |
+          v
++-------------------+
+| Inference Thread  |
++-------------------+
+          |
+          v
++-------------------+
+| Tracker / Counter |
++-------------------+
+          |
+          v
++-------------------+
+| Qt Visualization  |
++-------------------+
 
-                ┌──────────────────────────────┐
-                │     GStreamer Ingestion      │
-                │------------------------------│
-                │ Decode / Convert / Scale     │
-                │ Low-Latency Queue Handling   │
-                └──────────────┬───────────────┘
-                               │
-                               ▼
+```
 
-                ┌──────────────────────────────┐
-                │          Tee Split           │
-                └───────┬───────────┬──────────┘
-                        │           │
-                        │           │
-                        │           │
+## Detector Layer
 
-        RAW STREAM BRANCH           AI INFERENCE BRANCH
-        ------------------          -------------------
+```text
 
-    ┌──────────────────────┐     ┌──────────────────────┐
-    │ MPEG1 Video Encoder  │     │ OpenCV Appsink       │
-    │ MPEGTS Muxer         │     │ Frame Extraction     │
-    │ tcpserversink        │     │                      │
-    └──────────┬───────────┘     └──────────┬───────────┘
-               │                            │
-               │                            ▼
-               │                 ┌──────────────────────┐
-               │                 │ YOLO / AI Inference  │
-               │                 │ Object Tracking      │
-               │                 │ Counting Logic       │
-               │                 └──────────┬───────────┘
-               │                            │
-               │                            ▼
-               │                 ┌──────────────────────┐
-               │                 │ Annotated Frame      │
-               │                 │ Generation           │
-               │                 └──────────┬───────────┘
-               │                            │
-               │                            ▼
-               │                 ┌──────────────────────┐
-               │                 │ appsrc               │
-               │                 │ MPEG1 Encoder        │
-               │                 │ MPEGTS Muxer         │
-               │                 │ tcpserversink        │
-               │                 └──────────┬───────────┘
-               │                            │
-               └──────────────┬─────────────┘
-                              │
-                              ▼
-
-                ┌──────────────────────────────┐
-                │      Node.js Stream Router   │
-                │------------------------------│
-                │ TCP Client Connections       │
-                │ WebSocket Broadcasting       │
-                │ /raw and /ai streams         │
-                └──────────────┬───────────────┘
-                               │
-                               ▼
-
-                ┌──────────────────────────────┐
-                │        Web Frontend          │
-                │------------------------------│
-                │ JSMpeg Browser Players       │
-                │ Side-by-Side Streams         │
-                │ Live AI Counters             │
-                └──────────────────────────────┘
+          Detector Factory
+                 |
+       +---------+---------+
+       |                   |
+       v                   v
+ Ultralytics         ONNX Runtime
+  (Ubuntu)          (Raspberry Pi)
 
 ```
 

@@ -1,0 +1,9 @@
+numpy
+opencv-python
+
+PyQt5
+
+onnxruntime
+
+psutil
+

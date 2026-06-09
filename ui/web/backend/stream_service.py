@@ -63,7 +63,6 @@ class StreamService(BaseService):
         duration = Gst.util_uint64_scale_int(1, Gst.SECOND, 15)
         self.timestamp = 0
         while self.running:
-            print("Stream_service => Trying to pull frame from bus")
             packet = self.frame_bus.latest()
             if packet is None:
                 print("Stream_service => No packet recieved")
@@ -90,7 +89,6 @@ class StreamService(BaseService):
             if retval != Gst.FlowReturn.OK:
                 print("GST push-buffer failed")
             metrics.stream_fps.tick()
-            print(retval)
 
     def draw_results(self, frame):
         result = self.result_bus.latest()
