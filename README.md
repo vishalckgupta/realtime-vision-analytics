@@ -315,6 +315,27 @@ The current implementation prioritizes:
 
 over raw production optimization.
 
+## Performance
+
+Ubuntu VM
+- YOLOv8n (Ultralytics)
+- Real-time operation
+
+Raspberry Pi 4
+- YOLOv8n ONNX
+- ~300-400 ms inference latency
+- CPU-only execution
+
+## Lessons Learned
+
+- Building low-latency video pipelines with GStreamer
+- Shared-memory transport between pipeline stages
+- Deploying AI applications on Raspberry Pi
+- Migrating from PyTorch to ONNX Runtime for portability
+- Measuring and visualizing real-time telemetry
+- Designing detector abstraction layers
+
+  
 # Author
 
 Vishal Ck Gupta
