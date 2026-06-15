@@ -1,5 +1,13 @@
 # Realtime Vision Analytics Framework
 
+Real-time object detection, tracking and counting system.
+
+## Project Demo Video
+
+https://youtu.be/AS2aLneFbEA
+
+## Highlights
+
 A modular realtime computer vision framework built using Python, GStreamer, OpenCV, YOLO, Qt and FastAPI.
 
 This project demonstrates a scalable architecture for:
@@ -19,13 +27,6 @@ The framework is designed with an industrial-style modular architecture, emphasi
 - incremental scalability
 
 ---
-
-## Project Demo
-
-Watch the demo video:
-
-https://youtu.be/AS2aLneFbEA
-
 
 # Features
 
