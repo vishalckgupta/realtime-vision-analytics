@@ -110,7 +110,8 @@ The framework is designed with an industrial-style modular architecture, emphasi
 +-------------------+
 | Inference Thread  |
 +-------------------+
-          |
+          ├── Ultralytics YOLO (Ubuntu)
+          └── ONNX Runtime (Raspberry Pi)
           v
 +-------------------+
 | Tracker / Counter |
