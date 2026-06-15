@@ -20,6 +20,13 @@ The framework is designed with an industrial-style modular architecture, emphasi
 
 ---
 
+## Project Demo
+
+Watch the demo video:
+
+https://youtu.be/AS2aLneFbEA
+
+
 # Features
 
 ## Realtime Camera Ingestion
